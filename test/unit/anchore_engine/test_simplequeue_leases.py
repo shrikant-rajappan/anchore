@@ -3,6 +3,7 @@ Tests for the internal simplequeue client lease convenience functions.
 """
 import pytest
 from anchore_engine.subsys import logger
+from anchore_engine.subsys.identities import IdentityManager, HttpBasicCredential
 from anchore_engine.clients.services.simplequeue import run_target_with_lease, run_target_with_queue_ttl, SimpleQueueClient
 
 logger.enable_test_logging()
@@ -128,8 +129,9 @@ def test_run_target_with_lease_ok():
     SimpleQueueClient.create_lease = create_lease_mock(fail=False)
     SimpleQueueClient.release_lease = release_lease_mock(fail=False)
 
-    run_target_with_lease(('user', 'pass'), 'test_lease', pass_target, client_id='test1')
-
+    # Pre-load the cache to ensure no db hit needed
+    IdentityManager._credential_cache.cache_it('anchore-system', HttpBasicCredential('anchore-system', 'somepass'))
+    run_target_with_lease('user', 'test_lease', pass_target, client_id='test1')
 
 
 def test_run_target_with_lease_conn_error():
@@ -143,6 +145,6 @@ def test_run_target_with_lease_conn_error():
 
 
     with pytest.raises(Exception) as raised_ex:
-        run_target_with_lease(('user', 'pass'), 'test_lease', pass_target, client_id='test1')
+        run_target_with_lease('user', 'test_lease', pass_target, client_id='test1')
 
     logger.info('Caught: {}'.format(raised_ex))
