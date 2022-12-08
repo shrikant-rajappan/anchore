@@ -37,7 +37,7 @@ prometheus-flask-exporter==0.3.0
 python-swiftclient==3.6.0
 python-keystoneclient==3.17.0
 pytz==2018.5
-certifi==2018.10.15
+certifi==2022.12.7
 yosai==0.3.2
 zope.component==4.5
 zope.interface==4.5.0
