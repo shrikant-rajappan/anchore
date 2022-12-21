@@ -680,7 +680,26 @@ def java_prepdb_from_squashtar(unpackdir, squashtar, java_file_regexp):
                 if javafilepatt.match(filename): #re.match(java_file_regexp, filename):
                     javamembers.append(member)
 
-            tfl.extractall(path=os.path.join(javatmpdir, "rootfs"), members=javamembers)
+            def is_within_directory(directory, target):
+                
+                abs_directory = os.path.abspath(directory)
+                abs_target = os.path.abspath(target)
+            
+                prefix = os.path.commonprefix([abs_directory, abs_target])
+                
+                return prefix == abs_directory
+            
+            def safe_extract(tar, path=".", members=None, *, numeric_owner=False):
+            
+                for member in tar.getmembers():
+                    member_path = os.path.join(path, member.name)
+                    if not is_within_directory(path, member_path):
+                        raise Exception("Attempted Path Traversal in Tar File")
+            
+                tar.extractall(path, members, numeric_owner=numeric_owner) 
+                
+            
+            safe_extract(tfl, path=os.path.join(javatmpdir,"rootfs"), members=javamembers)
         ret = os.path.join(javatmpdir, "rootfs")
 
     return(ret)    
@@ -715,7 +734,26 @@ def python_prepdb_from_squashtar(unpackdir, squashtar, py_file_regexp):
                             pymembers.append(member)
                             break
 
-            tfl.extractall(path=os.path.join(pytmpdir, "rootfs"), members=pymembers)
+            def is_within_directory(directory, target):
+                
+                abs_directory = os.path.abspath(directory)
+                abs_target = os.path.abspath(target)
+            
+                prefix = os.path.commonprefix([abs_directory, abs_target])
+                
+                return prefix == abs_directory
+            
+            def safe_extract(tar, path=".", members=None, *, numeric_owner=False):
+            
+                for member in tar.getmembers():
+                    member_path = os.path.join(path, member.name)
+                    if not is_within_directory(path, member_path):
+                        raise Exception("Attempted Path Traversal in Tar File")
+            
+                tar.extractall(path, members, numeric_owner=numeric_owner) 
+                
+            
+            safe_extract(tfl, path=os.path.join(pytmpdir,"rootfs"), members=pymembers)
         ret = os.path.join(pytmpdir, "rootfs")
 
     return(ret)    
@@ -737,7 +775,26 @@ def apk_prepdb_from_squashtar(unpackdir, squashtar):
 
             apkmembers = []
             apkmembers.append(tfl.getmember(apkdbfile))
-            tfl.extractall(path=os.path.join(apktmpdir, "rootfs"), members=apkmembers)
+            def is_within_directory(directory, target):
+                
+                abs_directory = os.path.abspath(directory)
+                abs_target = os.path.abspath(target)
+            
+                prefix = os.path.commonprefix([abs_directory, abs_target])
+                
+                return prefix == abs_directory
+            
+            def safe_extract(tar, path=".", members=None, *, numeric_owner=False):
+            
+                for member in tar.getmembers():
+                    member_path = os.path.join(path, member.name)
+                    if not is_within_directory(path, member_path):
+                        raise Exception("Attempted Path Traversal in Tar File")
+            
+                tar.extractall(path, members, numeric_owner=numeric_owner) 
+                
+            
+            safe_extract(tfl, path=os.path.join(apktmpdir,"rootfs"), members=apkmembers)
         ret = os.path.join(apktmpdir, "rootfs")
 
     return(ret)    
@@ -761,7 +818,26 @@ def dpkg_prepdb_from_squashtar(unpackdir, squashtar):
                 filename = re.sub("^\./|^/", "", filename)
                 if filename.startswith("var/lib/dpkg") or filename.startswith("usr/share/doc"):
                     dpkgmembers.append(member)
-            tfl.extractall(path=os.path.join(dpkgtmpdir, "rootfs"), members=dpkgmembers)
+            def is_within_directory(directory, target):
+                
+                abs_directory = os.path.abspath(directory)
+                abs_target = os.path.abspath(target)
+            
+                prefix = os.path.commonprefix([abs_directory, abs_target])
+                
+                return prefix == abs_directory
+            
+            def safe_extract(tar, path=".", members=None, *, numeric_owner=False):
+            
+                for member in tar.getmembers():
+                    member_path = os.path.join(path, member.name)
+                    if not is_within_directory(path, member_path):
+                        raise Exception("Attempted Path Traversal in Tar File")
+            
+                tar.extractall(path, members, numeric_owner=numeric_owner) 
+                
+            
+            safe_extract(tfl, path=os.path.join(dpkgtmpdir,"rootfs"), members=dpkgmembers)
 
         ret = os.path.join(dpkgtmpdir, "rootfs")
 
@@ -786,7 +862,26 @@ def rpm_prepdb_from_squashtar(unpackdir, squashtar):
                 if filename.startswith("var/lib/rpm"):
                     rpmmembers.append(member)
 
-            tfl.extractall(path=os.path.join(rpmtmpdir, "rootfs"), members=rpmmembers)
+            def is_within_directory(directory, target):
+                
+                abs_directory = os.path.abspath(directory)
+                abs_target = os.path.abspath(target)
+            
+                prefix = os.path.commonprefix([abs_directory, abs_target])
+                
+                return prefix == abs_directory
+            
+            def safe_extract(tar, path=".", members=None, *, numeric_owner=False):
+            
+                for member in tar.getmembers():
+                    member_path = os.path.join(path, member.name)
+                    if not is_within_directory(path, member_path):
+                        raise Exception("Attempted Path Traversal in Tar File")
+            
+                tar.extractall(path, members, numeric_owner=numeric_owner) 
+                
+            
+            safe_extract(tfl, path=os.path.join(rpmtmpdir,"rootfs"), members=rpmmembers)
 
         rc = rpm_prepdb(rpmtmpdir)
         ret = os.path.join(rpmtmpdir, "rpmdbfinal") #, "var", "lib", "rpm")
